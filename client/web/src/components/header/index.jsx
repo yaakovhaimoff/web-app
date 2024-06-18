@@ -1,30 +1,55 @@
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../contexts/authContext/index'
-import { doSignOut } from '../../firebase/auth'
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/authContext/index';
+import { doSignOut } from '../../firebase/auth';
+import { AppBar, Toolbar, Typography, Slider, Box, TextField, Button } from '@mui/material';
 
-const Header = () => {
-    const navigate = useNavigate()
-    const { userLoggedIn, currentUser } = useAuth()
+import FilterOptions from '../books/FilterOptions';
+
+const Header = ({ handleFilterChange }) => {
+    const navigate = useNavigate();
+    const { userLoggedIn, currentUser } = useAuth();
 
     return (
-        <nav className='flex flex-row gap-x-2 w-full z-20 fixed top-0 left-0 h-12 border-b place-content-center items-center bg-gray-200'>
-            {
-                userLoggedIn
-                    ?
-                    <>
-                        <button onClick={() => { doSignOut().then(() => { navigate('/login') }) }} className='text-sm text-blue-600 underline'>Logout</button>
-                        <div className='text-2xl font-bold pt-14'> {currentUser.displayName ? currentUser.displayName : currentUser.email}, you are now logged in.</div>
-                    </>
-                    :
-                    <>
-                        <Link className='text-sm text-blue-600 underline' to={'/login'}>Login</Link>
-                        <Link className='text-sm text-blue-600 underline' to={'/register'}>Register New Account</Link>
-                    </>
-            }
+        <AppBar position="static">
+            <Toolbar>
+                {userLoggedIn && (
+                  <FilterOptions/>
+                )}
+                <Box sx={{ flexGrow: 1 }} />
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                    {userLoggedIn ? (
+                        <>
+                            <Typography variant="body1">
+                                {currentUser.displayName ? currentUser.displayName : currentUser.email}
+                            </Typography>
+                            <Button
+                                color="inherit"
+                                onClick={() => {
+                                    doSignOut().then(() => {
+                                        navigate('/login');
+                                    });
+                                }}
+                                className='text-sm text-blue-600 underline'
+                            >
+                                Logout
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Link className='text-sm text-blue-600 underline' to={'/login'} style={{ marginRight: '1rem' }}>
+                                Login
+                            </Link>
+                            <Link className='text-sm text-blue-600 underline' to={'/register'}>
+                                Register New Account
+                            </Link>
+                        </>
+                    )}
+                </Box>
+            </Toolbar>
+        </AppBar>
+    );
+};
 
-        </nav>
-    )
-}
+export default Header;
 
-export default Header
