@@ -1,20 +1,43 @@
-import React, { useState } from 'react';
+import React from 'react';
+import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/authContext/index';
-import { doSignOut } from '../../firebase/auth';
-import { AppBar, Toolbar, Typography, Slider, Box, TextField, Button } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Button } from '@mui/material';
 
 import FilterOptions from '../books/FilterOptions';
+import { useAuth } from '../../contexts/authContext/index';
+import { doSignOut } from '../../firebase/auth';
 
-const Header = ({ handleFilterChange }) => {
+const Header = () => {
     const navigate = useNavigate();
     const { userLoggedIn, currentUser } = useAuth();
+
+    const renderToolBar = () => {
+        return (
+                <FilterOptions
+                    handleFilterChange={handleFilterChange} />
+        );
+    }
+
+    const handleFilterChange = (publicationYear) => {
+        console.log("change")
+        const params = [];
+        if (publicationYear) {
+            params.push(`after=${publicationYear[0]}&before=${publicationYear[1]}`)
+        }
+
+        let url = `$/books${params ? `?${params.join('&')}` : ``}`;
+        axios.get(url)
+            .then((response) => {
+                setBooks(response.data.Books)
+            })
+            .catch((error) => console.error(error));
+    }
 
     return (
         <AppBar position="static">
             <Toolbar>
                 {userLoggedIn && (
-                  <FilterOptions/>
+                    renderToolBar()
                 )}
                 <Box sx={{ flexGrow: 1 }} />
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>

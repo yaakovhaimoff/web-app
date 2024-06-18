@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
-import {AppBar} from '@mui/material';
 
 // import BookList from './components/books/BookList';
 import BookForm from './components/books/BookForm';
@@ -59,34 +58,10 @@ const App = () => {
 
   }
 
-  const handleFilterChange = (publicationYear) => {
-    const params = [];
-    if (publicationYear) {
-      params.push(`after=${publicationYear[0]}&before=${publicationYear[1]}`)
-    }
-
-    let url = `${baseURL}/books${params ? `?${params.join('&')}` : ``}`;
-    axios.get(url)
-      .then((response) => {
-        setBooks(response.data.Books)
-      })
-      .catch((error) => console.error(error));
-  }
-
-  const renderToolBar = () => {
-    return (
-      <AppBar position="sticky" color='inherit'>
-        <FilterOptions
-          handleFilterChange={handleFilterChange} />
-      </AppBar>
-    );
-  }
-
   return (
     <BrowserRouter>
       <AuthProvider>
         <Header />
-        {/* {renderToolBar()} */}
         <div className="w-full h-screen flex flex-col">
           <Routes>
             <Route path="*" element={<Login />} />
